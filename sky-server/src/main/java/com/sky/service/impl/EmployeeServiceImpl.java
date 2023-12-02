@@ -96,8 +96,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 员工分页查询
-     * @param employeePageQueryDTO
-     * @return
+     * @param employeePageQueryDTO 员工分页查询条件
+     * @return 员工分页查询结果
      */
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         // select * from employee limit 0, 10
@@ -108,5 +108,48 @@ public class EmployeeServiceImpl implements EmployeeService {
         long total = page.getTotal();
         List<Employee> records = page.getResult();
         return new PageResult(total, records);
+    }
+
+    /**
+     * 启用或禁用员工
+     * @param status 状态
+     * @param id 员工id
+     */
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 根据id查询员工
+     * @param id 员工id
+     * @return
+     */
+    public Employee getById(Long id) {
+        return employeeMapper.getById(id);
+    }
+
+
+    /**
+     * 编辑员工信息
+     * @param employeeDTO 员工信息
+     */
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+
+        // 对象属性拷贝
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 设置当前记录的修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+
+        // 设置当前记录修改人id
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.update(employee);
     }
 }
