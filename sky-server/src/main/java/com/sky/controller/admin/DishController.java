@@ -42,7 +42,7 @@ public class DishController {
     }
 
     /**
-     * 菜品批量删除
+     * 菜品批量删除, 可能涉及到菜品flavor和套餐的删除
      * @param ids 菜品id集合
      */
     @DeleteMapping
