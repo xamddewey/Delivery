@@ -39,5 +39,16 @@ public interface DishService {
      */
     void deleteBatch(List<Long> ids);
 
+    /**
+     * 根据id修改菜品
+     * @param dishDTO
+     */
     void updateWithFlavor(DishDTO dishDTO);
+
+    /**
+     * 根据id启用或禁用菜品
+     * @param status
+     * @param id
+     */
+    void startOrStop(Integer status, Long id);
 }

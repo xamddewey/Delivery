@@ -8,6 +8,7 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -95,13 +97,13 @@ public class DishServiceImpl implements DishService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteBatch(List<Long> ids) {
         //判断当前菜品是否能够删除---是否存在起售中的菜品？
-        for (Long id : ids) {
+        ids.forEach(id -> {
             Dish dish = dishMapper.getById(id);
             //如果存在起售中的菜品，则不能删除
             if (dish.getStatus().equals(StatusConstant.ENABLE)) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
-        }
+        });
 
         //判断当前菜品是否能够删除---是否被套餐关联了？
         List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishId(ids);
@@ -110,13 +112,18 @@ public class DishServiceImpl implements DishService {
         }
 
         // 删除菜品表中的菜品数据
-        for (Long id : ids) {
+        ids.forEach(id -> {
             dishMapper.deleteById(id);
             //删除菜品关联的口味数据
             dishFlavorMapper.deleteByDishId(id);
-        }
+        });
     }
 
+    /**
+     * 修改菜品
+     * @param dishDTO
+     */
+    @Transactional
     public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
@@ -134,6 +141,36 @@ public class DishServiceImpl implements DishService {
                 dishFlavor.setDishId(dishDTO.getId());
             });
             dishFlavorMapper.insertBatch(flavors);
+        }
+    }
+
+    /**
+     * 根据id启用或禁用菜品
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+
+        if (status.equals(StatusConstant.DISABLE)) {
+            // 禁用菜品，需要将菜品关联的口味也禁用
+            List<Long> dishIds = new ArrayList<>();
+            dishIds.add(id);
+
+            List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishId(dishIds);
+            if (setmealIds != null && !setmealIds.isEmpty()) {
+                for (var setmealId : setmealIds) {
+                    var setmeal = Setmeal.builder()
+                            .id(setmealId)
+                            .status(StatusConstant.DISABLE)
+                            .build();
+                    setmealDishMapper.update(setmeal);
+                }
+            }
         }
     }
 }

@@ -61,10 +61,31 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 修改菜品
+     * @param dishDTO
+     * @return
+     */
     @PutMapping
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
         dishService.updateWithFlavor(dishDTO);
+        return Result.success();
+    }
+
+    /**
+     * 启用或禁用菜品
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        switch (status) {
+            case 1 -> log.info("启用菜品: {}", id);
+            case 0 -> log.info("禁用菜品: {}", id);
+        }
+        dishService.startOrStop(status, id);
         return Result.success();
     }
 }
