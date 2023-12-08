@@ -9,7 +9,7 @@
             <if test="userId != null">and user_id = #{userId}</if>
             <if test="dishId != null">and dish_id = #{dishId}</if>
             <if test="setmealId != null">and setmeal_id = #{setmealId}</if>
-            <if test="dishFlavour != null">and dish_flavor = #{dishFlavor}</if>
+            <if test="dishFlavor != null">and dish_flavor = #{dishFlavor}</if>
         </where>
         order by create_time desc
     </select>
