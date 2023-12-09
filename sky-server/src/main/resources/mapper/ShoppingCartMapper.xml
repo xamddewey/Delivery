@@ -13,4 +13,13 @@
         </where>
         order by create_time desc
     </select>
+
+    <insert id="insertBatch" parameterType="com.sky.entity.ShoppingCart">
+        insert into shopping_cart
+        (name, image, user_id, dish_id, setmeal_id, dish_flavor, amount, create_time)
+        values
+        <foreach collection="shoppingCartList" item="item" index="index" separator=",">
+            (#{item.name}, #{item.image}, #{item.userId}, #{item.dishId}, #{item.setmealId}, #{item.dishFlavor}, #{item.amount}, #{item.createTime})
+        </foreach>
+    </insert>
 </mapper>
