@@ -456,8 +456,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void delivery(Long id) throws Exception {
         Orders orderDB = orderMapper.getById(id);
-
-        if (orderDB != null || !orderDB.getStatus().equals(Orders.CONFIRMED)) {
+        if (orderDB == null || !orderDB.getStatus().equals(Orders.CONFIRMED)) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
 

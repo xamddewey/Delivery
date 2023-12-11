@@ -97,7 +97,7 @@ public class OrderController {
      * @return
      */
     @PutMapping("/delivery/{id}")
-    public Result delivery(@PathVariable Long orderId) {
+    public Result delivery(@PathVariable(name = "id") Long orderId) {
         try {
             orderService.delivery(orderId);
         } catch (Exception e) {
